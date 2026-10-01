@@ -25,6 +25,7 @@ export async function ContinueWatching({ userId }: { userId: string }) {
           <div key={video.id} className="w-36 shrink-0 sm:w-40">
             <VideoCard
               video={video}
+              posterUrl={video.hasPoster ? `/api/poster/${video.id}` : undefined}
               progress={entry.position / entry.duration}
             />
           </div>

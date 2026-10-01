@@ -45,7 +45,12 @@ export default async function WatchPage({
       <Link href="/library" className="text-sm hover:text-accent">
         ← Library
       </Link>
-      <h1 className="text-3xl font-bold">{video.title}</h1>
+      <h1 className="text-3xl font-bold">
+        {video.title}
+        {video.year !== undefined && (
+          <span className="font-normal text-black/50"> ({video.year})</span>
+        )}
+      </h1>
       {LIMITED_SUPPORT_EXTENSIONS.includes(video.ext) && (
         <div className="rounded-xl border border-accent/40 bg-accent/5 px-4 py-3 text-sm">
           This format may not play in every browser. MP4 or WebM work best.
