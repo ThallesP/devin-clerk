@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { getVideo } from "@/lib/library";
 import { getProgress, isFinished } from "@/lib/progress";
+import { findSubtitles } from "@/lib/subtitles";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) {
@@ -37,6 +38,7 @@ export default async function WatchPage({
   }
   const { userId } = await auth();
   const entry = userId ? await getProgress(userId, video.id) : null;
+  const subs = await findSubtitles(video.absPath);
 
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12">
@@ -55,6 +57,11 @@ export default async function WatchPage({
         title={video.title}
         startAt={entry && !isFinished(entry) ? entry.position : undefined}
         progressEndpoint="/api/progress"
+        tracks={subs.map((s) => ({
+          src: `/api/subtitles/${video.id}/${s.index}`,
+          label: s.label,
+          lang: s.lang,
+        }))}
       />
       <dl className="flex flex-col gap-2 text-sm">
         <div className="flex gap-2">
@@ -71,6 +78,14 @@ export default async function WatchPage({
             <code>{video.relPath}</code>
           </dd>
         </div>
+        {subs.length > 0 && (
+          <div className="flex gap-2">
+            <dt className="w-24 font-medium text-black/60">Subtitles</dt>
+            <dd>
+              {subs.length} subtitle track{subs.length === 1 ? "" : "s"}
+            </dd>
+          </div>
+        )}
       </dl>
     </section>
   );
