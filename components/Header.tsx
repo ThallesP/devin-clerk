@@ -19,6 +19,9 @@ export function Header() {
           <Link href="/dashboard" className="hover:text-accent">
             Dashboard
           </Link>
+          <Link href="/library" className="hover:text-accent">
+            Library
+          </Link>
           <Show when="signed-out">
             <SignInButton mode="modal">
               <button className="hover:text-accent">Sign in</button>
