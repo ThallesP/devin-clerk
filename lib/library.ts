@@ -1,5 +1,5 @@
 import type { Stats } from "node:fs";
-import { readdir, lstat, stat } from "node:fs/promises";
+import { readdir, lstat, realpath, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -144,6 +144,21 @@ export async function getVideo(
     const fileStats = await lstat(absPath);
     const ext = path.extname(absPath).toLowerCase();
     if (!fileStats.isFile() || !VIDEO_EXTENSIONS.includes(ext)) {
+      return null;
+    }
+
+    const [realRoot, realFile] = await Promise.all([
+      realpath(getLibraryRoot()),
+      realpath(absPath),
+    ]);
+    const relativeFile = path.relative(realRoot, realFile);
+    if (
+      !relativeFile ||
+      relativeFile === ".." ||
+      relativeFile.startsWith(".." + path.sep) ||
+      path.isAbsolute(relativeFile) ||
+      relativeFile !== path.relative(getLibraryRoot(), absPath)
+    ) {
       return null;
     }
 
