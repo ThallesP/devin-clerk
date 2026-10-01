@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { getVideo } from "@/lib/library";
+import { findSubtitles } from "@/lib/subtitles";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) {
@@ -34,6 +35,7 @@ export default async function WatchPage({
   if (!video) {
     notFound();
   }
+  const subs = await findSubtitles(video.absPath);
 
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12">
@@ -50,6 +52,11 @@ export default async function WatchPage({
         videoId={video.id}
         src={`/api/stream/${video.id}`}
         title={video.title}
+        tracks={subs.map((s) => ({
+          src: `/api/subtitles/${video.id}/${s.index}`,
+          label: s.label,
+          lang: s.lang,
+        }))}
       />
       <dl className="flex flex-col gap-2 text-sm">
         <div className="flex gap-2">
@@ -66,6 +73,14 @@ export default async function WatchPage({
             <code>{video.relPath}</code>
           </dd>
         </div>
+        {subs.length > 0 && (
+          <div className="flex gap-2">
+            <dt className="w-24 font-medium text-black/60">Subtitles</dt>
+            <dd>
+              {subs.length} subtitle track{subs.length === 1 ? "" : "s"}
+            </dd>
+          </div>
+        )}
       </dl>
     </section>
   );
