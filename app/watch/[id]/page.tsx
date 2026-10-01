@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { getVideo } from "@/lib/library";
+import { getProgress, isFinished } from "@/lib/progress";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) {
@@ -34,6 +35,8 @@ export default async function WatchPage({
   if (!video) {
     notFound();
   }
+  const { userId } = await auth();
+  const entry = userId ? await getProgress(userId, video.id) : null;
 
   return (
     <section className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-12">
@@ -50,6 +53,8 @@ export default async function WatchPage({
         videoId={video.id}
         src={`/api/stream/${video.id}`}
         title={video.title}
+        startAt={entry && !isFinished(entry) ? entry.position : undefined}
+        progressEndpoint="/api/progress"
       />
       <dl className="flex flex-col gap-2 text-sm">
         <div className="flex gap-2">
