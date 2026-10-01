@@ -1,4 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
+import { ContinueWatching } from "@/components/ContinueWatching";
 import { VideoCard } from "@/components/VideoCard";
 import {
   getLibraryRoot,
@@ -8,6 +9,7 @@ import {
 
 export default async function LibraryPage() {
   await auth.protect();
+  const { userId } = await auth();
   const videos = await scanLibrary();
 
   return (
@@ -18,6 +20,7 @@ export default async function LibraryPage() {
           {videos.length} {videos.length === 1 ? "video" : "videos"}
         </p>
       </div>
+      {userId && <ContinueWatching userId={userId} />}
       {videos.length > 0 ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {videos.map((video) => (
