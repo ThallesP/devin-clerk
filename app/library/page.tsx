@@ -21,7 +21,11 @@ export default async function LibraryPage() {
       {videos.length > 0 ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {videos.map((video) => (
-            <VideoCard key={video.id} video={video} />
+            <VideoCard
+              key={video.id}
+              video={video}
+              posterUrl={video.hasPoster ? `/api/poster/${video.id}` : undefined}
+            />
           ))}
         </div>
       ) : (
