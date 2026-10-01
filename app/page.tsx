@@ -9,11 +9,16 @@ export default function Home() {
       </span>
       <h1 className="text-5xl font-bold tracking-tight">{appConfig.name}</h1>
       <p className="max-w-xl text-lg text-black/70">{appConfig.description}</p>
+      <p className="max-w-xl text-black/60">
+        Scan a folder into a poster library, stream it in the browser, resume
+        right where you stopped and load the subtitles that sit next to each
+        file.
+      </p>
       <Link
         href="/dashboard"
         className="rounded-full bg-accent px-6 py-3 font-medium text-white shadow-sm transition hover:opacity-90"
       >
-        Get early access →
+        Start watching →
       </Link>
       <p className="text-sm text-black/50">
         Your movies, your rips, your server — no subscriptions.

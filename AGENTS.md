@@ -27,9 +27,21 @@ Run lint, typecheck and build before opening a PR.
 
 - `app.config.ts` — app `name`, `description`, `emoji`, `accent` color and `upcomingFeatures` (the "Coming soon" list). Branding and the feature list live here, not in components.
 - `app/page.tsx` — public landing page that pitches the app. Must stay public.
-- `app/dashboard/page.tsx` — the "Coming soon" page for signed-in users: a greeting plus one card per `upcomingFeatures` entry, and a "Keep building" hint pointing at the next feature. Keep that hint.
+- `app/dashboard/page.tsx` — the signed-in home: a greeting, an "Open your library" button, the Continue watching row, then one card per `upcomingFeatures` entry and a "Keep building" hint pointing at the next feature (keep that hint). When `upcomingFeatures` is empty it shows a single "everything on the roadmap is live" card instead.
+- `app/library/page.tsx` — signed-in poster grid of every video in the library, with the Continue watching row on top.
+- `app/watch/[id]/page.tsx` — signed-in player page for one video: title and year, resume position, subtitle tracks and file info.
 - `app/api/roadmap/route.ts` — returns `upcomingFeatures` as JSON.
-- `components/Header.tsx` — top nav; `{/* AUTH CONTROLS GO HERE */}` marks where sign-in / user controls belong.
+- `app/api/library/route.ts` — `GET` returns `{ videos }` from the library scan.
+- `app/api/stream/[id]/route.ts` — streams a video file with HTTP Range support (200 / 206 / 416).
+- `app/api/poster/[id]/route.ts` — serves a video's local poster image.
+- `app/api/subtitles/[id]/[track]/route.ts` — serves a sidecar `.srt`/`.vtt` subtitle track as WebVTT.
+- `app/api/progress/route.ts` — `GET` lists the signed-in user's in-progress videos; `POST { videoId, position, duration }` saves playback progress.
+- All the pages above call `await auth.protect()`, and all API routes return `401` JSON when signed out.
+- `lib/library.ts` — library root, recursive scan, video ids (base64url of the relative path) and safe path resolution. `lib/metadata.ts` parses titles and years from file names, `lib/posters.ts` finds poster images, `lib/range.ts` and `lib/stream.ts` handle Range requests, `lib/subtitles.ts` finds and converts subtitles, and `lib/progress.ts` stores watch progress.
+- `components/Header.tsx` — top nav with Dashboard and Library links, followed by the Clerk sign-in / user controls.
+- `components/VideoCard.tsx`, `components/VideoPlayer.tsx`, `components/ContinueWatching.tsx` — poster card, client-side player (subtitles, resume, progress reporting) and the Continue watching row.
+- `WATCHTIME_LIBRARY_DIR` — folder of videos to serve, read from the server's filesystem (default `~/Videos`). Dotfiles and symlinked folders are skipped, and paths can't escape it.
+- `WATCHTIME_DATA_DIR` — where per-user data such as `progress.json` is written (default `.watchtime/` in the project, which is gitignored).
 - `docs/` and `workshop/` — the attendee walkthrough and facilitator material. Don't modify them for app changes.
 
 ## Planning requests

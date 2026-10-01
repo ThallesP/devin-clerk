@@ -43,3 +43,6 @@ next-env.d.ts
 
 # clerk
 .clerk/
+
+# watchtime per-user data
+.watchtime/
