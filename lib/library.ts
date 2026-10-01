@@ -2,6 +2,8 @@ import type { Stats } from "node:fs";
 import { readdir, lstat, realpath, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { parseFileName } from "@/lib/metadata";
+import { findPoster } from "@/lib/posters";
 
 export const VIDEO_EXTENSIONS = [".mp4", ".m4v", ".webm", ".mkv", ".mov", ".avi"];
 
@@ -10,6 +12,8 @@ export type Video = {
   relPath: string;
   fileName: string;
   title: string;
+  year?: number;
+  hasPoster: boolean;
   ext: string;
   size: number;
   modifiedAt: string;
@@ -53,20 +57,22 @@ export function resolveInLibrary(relPath: string): string | null {
   return abs;
 }
 
-function toVideo(relPath: string, fileStats: Stats): Video {
+async function toVideo(
+  relPath: string,
+  absPath: string,
+  fileStats: Stats,
+): Promise<Video> {
   const fileName = path.basename(relPath);
   const ext = path.extname(fileName).toLowerCase();
-  const title = path
-    .basename(fileName, path.extname(fileName))
-    .replace(/[._]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const { title, year } = parseFileName(fileName);
 
   return {
     id: encodeVideoId(relPath),
     relPath,
     fileName,
     title,
+    ...(year !== undefined ? { year } : {}),
+    hasPoster: (await findPoster(absPath)) !== null,
     ext,
     size: fileStats.size,
     modifiedAt: fileStats.mtime.toISOString(),
@@ -108,7 +114,7 @@ export async function scanLibrary(): Promise<Video[]> {
       try {
         const fileStats = await stat(absPath);
         const relPath = path.relative(root, absPath).split(path.sep).join("/");
-        videos.push(toVideo(relPath, fileStats));
+        videos.push(await toVideo(relPath, absPath, fileStats));
       } catch {
         continue;
       }
@@ -163,7 +169,7 @@ export async function getVideo(
     }
 
     const posixRelPath = relPath.split(path.sep).join("/");
-    return { ...toVideo(posixRelPath, fileStats), absPath };
+    return { ...(await toVideo(posixRelPath, absPath, fileStats)), absPath };
   } catch {
     return null;
   }

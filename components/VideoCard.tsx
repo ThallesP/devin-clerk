@@ -1,6 +1,15 @@
 import Link from "next/link";
 import type { Video } from "@/lib/library";
 
+function titleHue(title: string): number {
+  let hash = 2166136261;
+  for (let index = 0; index < title.length; index += 1) {
+    hash ^= title.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0) % 360;
+}
+
 function formatSize(bytes: number): string {
   if (bytes < 1024) {
     return `${bytes.toFixed(1)} B`;
@@ -31,6 +40,7 @@ export function VideoCard({
     typeof progress === "number"
       ? Math.max(0, Math.min(1, progress)) * 100
       : null;
+  const hue = titleHue(video.title);
 
   return (
     <Link href={`/watch/${video.id}`} className="group flex flex-col gap-2">
@@ -43,11 +53,18 @@ export function VideoCard({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br from-neutral-800 to-neutral-950 px-4 text-center text-white">
-            <span className="text-4xl" aria-hidden>
-              🎬
+          <div
+            className="flex h-full w-full flex-col items-center justify-center gap-3 px-4 text-center text-white"
+            style={{
+              background: `linear-gradient(135deg, hsl(${hue} 65% 45%), hsl(${(hue + 40) % 360} 70% 18%))`,
+            }}
+          >
+            <span className="line-clamp-4 text-2xl font-bold leading-tight">
+              {video.title}
             </span>
-            <span className="line-clamp-3 font-medium">{video.title}</span>
+            {video.year !== undefined && (
+              <span className="text-sm text-white/70">{video.year}</span>
+            )}
           </div>
         )}
         {progressPercent !== null && (
@@ -61,6 +78,9 @@ export function VideoCard({
       </div>
       <h2 className="line-clamp-2 font-semibold group-hover:text-accent">
         {video.title}
+        {video.year !== undefined && (
+          <span className="font-normal text-black/50"> {video.year}</span>
+        )}
       </h2>
       <div className="flex items-center gap-2 text-xs text-black/60">
         <span className="rounded-full bg-accent/10 px-2 py-0.5 font-medium uppercase text-accent">
