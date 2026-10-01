@@ -16,8 +16,7 @@ export default function Home() {
         Get early access →
       </Link>
       <p className="text-sm text-black/50">
-        This page is public. The early-access page should be for signed-in users
-        only.
+        Your movies, your rips, your server — no subscriptions.
       </p>
     </section>
   );

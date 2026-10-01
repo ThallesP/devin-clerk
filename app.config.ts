@@ -4,22 +4,30 @@ export type Feature = {
 };
 
 export const appConfig = {
-  name: "Your App",
-  description: "Describe your app in one sentence. Devin will fill this in.",
-  emoji: "🚀",
-  accent: "#7c3aed",
+  name: "WatchTime",
+  description: "A Jellyfin/Netflix alternative for watching local videos, movies and rips.",
+  emoji: "🍿",
+  accent: "#e11d48",
   upcomingFeatures: [
     {
-      title: "Your first feature",
-      description: "What people will be able to do once it's built.",
+      title: "Library folder scan",
+      description: "Point WatchTime at a folder and it lists every video file it finds.",
     },
     {
-      title: "Your second feature",
-      description: "Devin will write this list based on your app idea.",
+      title: "Posters and movie info",
+      description: "Show the title, year and poster art for each movie in your library.",
     },
     {
-      title: "Your third feature",
-      description: "Each one is a good next prompt for Devin.",
+      title: "In-browser player",
+      description: "Play any video in the browser with seeking, volume and fullscreen.",
+    },
+    {
+      title: "Continue watching",
+      description: "Pick up every movie right where you stopped watching it.",
+    },
+    {
+      title: "Subtitle support",
+      description: "Load .srt or .vtt subtitle files that sit next to a video.",
     },
   ] satisfies Feature[],
 };
